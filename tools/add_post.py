@@ -13,11 +13,14 @@
 
   3) სია:  python tools/add_post.py list
 
-მერე: git add -A; git commit -m "..."; git push   (და app.js-ში posts.json?v= რიცხვი გაზარდე, თუ ქეში ხელს უშლის)
+ყოველი ბრძანება პოსტს მაშინვე წერს საიტის დახურულ ბაზაში (tools/fs_push.py, გასაღები .secrets\firebase_key.json). git push საჭირო არ არის.
+  4) ბაზის სია: python tools/add_post.py list ;  ხელახლა ჩაწერა: python tools/add_post.py sync [--id t10c]
 სურათები მცირდება (900 px) და ინახება posts/ საქაღალდეში raw_<id>_N.jpg სახელით.
 """
 import argparse, json, os, re, sys
 from PIL import Image
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fs_push import push, count
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PJ = os.path.join(HERE, 'import', 'posts.json')
@@ -59,12 +62,19 @@ def main():
     p.add_argument('--id', required=True)
     p.add_argument('--link', action='append', default=[], help='ქსელი=ლინკი')
     sub.add_parser('list')
+    sy = sub.add_parser('sync', help='ერთი ან ყველა პოსტის ხელახლა ჩაწერა ბაზაში')
+    sy.add_argument('--id')
     x = ap.parse_args()
 
     posts = load()
     if x.cmd == 'list':
+        for pid, d in sorted(count(), key=lambda t: str(t[1].get('date'))):
+            print(pid, d.get('date'), d.get('status'), d.get('title'))
+        return
+    if x.cmd == 'sync':
         for q in posts:
-            print(q.get('id'), q.get('date'), q.get('status', 'planned'), q.get('title'))
+            if not x.id or q.get('id') == x.id:
+                push(q); print('ბაზაში ჩაიწერა:', q.get('id'))
         return
     if x.cmd == 'add':
         text = open(x.text, encoding='utf-8').read().strip() if x.text else ''
@@ -75,7 +85,8 @@ def main():
             entry['productId'] = x.product
         posts = [q for q in posts if q.get('id') != x.id] + [entry]
         save(posts)
-        print('დაემატა:', x.id)
+        push(entry)
+        print('დაემატა და ბაზაში ჩაიწერა (გუნდი უკვე ხედავს):', x.id)
         return
     if x.cmd == 'posted':
         for q in posts:
@@ -83,7 +94,8 @@ def main():
                 q['status'] = 'posted'
                 q['links'] = [{'network': l.split('=', 1)[0], 'url': l.split('=', 1)[1]} for l in x.link]
                 save(posts)
-                print('გამოქვეყნდა:', x.id)
+                push(q)
+                print('გამოქვეყნდა და ბაზაში ჩაიწერა:', x.id)
                 return
         sys.exit('ასეთი id არ მოიძებნა: ' + x.id)
 
