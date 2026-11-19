@@ -24,7 +24,7 @@ A closed team web app: „ნეოტექის მარკეტინგ�
 - `config.js`: `firebaseConfig` (web config, public by design) + `BRAND` (name, title, logo, shop URL/host, login domain, brand-manager categories, post styles, default post days, confirm hours). Re-branding = edit BRAND + colours + logo.
 - `firestore.rules`: security rules. After any change paste them into Firebase console → Firestore → Rules → Publish (see §7).
 - `import/posts.json` + `import/posts/*.jpg` (LOCAL ONLY, in .gitignore, never on GitHub): OUR prepared posts (made by Claude/marketing): id, date, time, title, style, where, images, text, status (planned/posted), links [{network,url}], videos [Drive file id] (shown with the Drive player; the file stays on Drive, `add_post.py add --video <Drive link>`), optional productId (links to a brand upload).
-- `tools/add_post.py`: add a ready post / mark posted with links / list (writes `import/`). Then: start the local server (`.claude\launch.json` → „marketing“, http://localhost:8765), marketing logs in there → „გამზადებული პოსტები“ → „📥 იმპორტი“ → „კი“: posts go into Firestore `posts` (read: approved users only, write: marketing only). The live site never serves post files.
+- `tools/add_post.py`: add a ready post / mark posted with links / list (writes `import/` AND writes the post straight into Firestore `posts` via `tools/fs_push.py` with the service-account key `D:\Neotech IA 2026\.secrets\firebase_key.json`, outside the repo, never on GitHub). Team sees it at once; no button, no push. `list` = what is in the database, `sync [--id]` = write again. Firestore `posts`: read approved users only, write marketing (or the key). The live site never serves post files. The old import button was removed from the site on 2026-11-19 (`importPosts()` kept in code).
 - `fonts/` FiraGO, `raw_logo.png` (white logo; `raw_` prefix only so the parent project's image checker skips it).
 - `README.md` short Georgian overview, `ინსტრუქცია_სრული.md` full Georgian guide for the user.
 - Cache: browsers cache files (GitHub max-age 600). On every change bump `?v=N` everywhere (index.html → app.js, app.js → store.js/config.js/posts.json, store.js → config.js). Use a small regex replace of `\?v=OLD\b` → `?v=NEW` in all three files.
@@ -52,8 +52,8 @@ Closed site, blue minimal start page with role buttons; brand uploads go ONLY to
 ## 6. Daily workflow for Claude
 1. Read Firestore (marketing logged in, or Firebase console) for `settings/main.workRequest`, picked products and `ourSchedule`.
 2. Make posts with the parent project's skills (Neotech styles 1/2/3), save finished files in `1_social media\<product>\`.
-3. `python tools/add_post.py add --id … --title … --text …/post.txt --img …/post.png --img …/cover.png --video <Drive link> --style N --where "…" [--product <productId>]`, then import on localhost:8765 (see §2). No push needed for posts.
-4. Marketing sets date/time on the site → schedule in Metricool at that date → after publishing `tools/add_post.py posted --id … --link "Facebook=…" …` and import again on localhost (import keeps the date set on the site).
+3. `python tools/add_post.py add --id … --title … --text …/post.txt --img …/post.png --img …/cover.png --video <Drive link> --style N --where "…" [--product <productId>]`; it is in the database at once (see §2). No push needed for posts.
+4. Marketing sets date/time on the site → schedule in Metricool at that date → after publishing `tools/add_post.py posted --id … --link "Facebook=…" …`; it writes to the database at once (the date set on the site is kept).
 Not built yet: automatic pickup of „▶ დაიწყე მუშაობა“ (idea: scheduled task that reads `settings/main.workRequest` every 15 min while the computer is on, sets status 'working'/'done').
 
 ## 7. Set up for a NEW brand / new account (step by step)

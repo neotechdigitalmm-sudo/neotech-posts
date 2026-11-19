@@ -1,5 +1,5 @@
-import { createStore } from './store.js?v=40';
-import { BRAND } from './config.js?v=40';
+import { createStore } from './store.js?v=41';
+import { BRAND } from './config.js?v=41';
 document.title = BRAND.title;
 
 const MONTHS = ['იანვარი', 'თებერვალი', 'მარტი', 'აპრილი', 'მაისი', 'ივნისი', 'ივლისი', 'აგვისტო', 'სექტემბერი', 'ოქტომბერი', 'ნოემბერი', 'დეკემბერი'];
@@ -391,7 +391,7 @@ function readyPosts() {
   const tag = p => p.status === 'posted' ? '<span class="stag s-posted">✓ გამოქვეყნდა</span>'
     : p.status === 'planned' ? '<span class="stag s-planned">📅 კალენდარშია, ელოდება გამოქვეყნებას</span>'
     : '<span class="stag s-ready">⚠ კალენდარში არ არის</span>';
-  return `<div class="sec-title"><span class="num">2</span><div><h2>გამზადებული პოსტები</h2><div class="muted small">მონიშნე, როდის დაიდოს, და დააჭირე „შენახვა“. მერე Metricool-ზე დაიდება.</div></div><button class="btn ghost sm" id="import-posts" style="margin-left:auto">📥 იმპორტი</button></div>
+  return `<div class="sec-title"><span class="num">2</span><div><h2>გამზადებული პოსტები</h2><div class="muted small">მონიშნე, როდის დაიდოს, და დააჭირე „შენახვა“. მერე Metricool-ზე დაიდება.</div></div></div>
     <div class="rsum"><span class="stag s-ready">⚠ კალენდარში არ არის: ${n('ready')}</span><span class="stag s-planned">📅 კალენდარშია: ${n('planned')}</span><span class="stag s-posted">✓ გამოქვეყნდა: ${n('posted')}</span></div>
     <div class="ready">${list.length ? list.map(p => `<div class="rcard r-${p.status}">
       <span class="thumb lg" style="${p.images?.[0] ? `background-image:url('${p.images[0]}')` : ''}"></span>
