@@ -1,5 +1,5 @@
-import { createStore } from './store.js?v=41';
-import { BRAND } from './config.js?v=41';
+import { createStore } from './store.js?v=42';
+import { BRAND } from './config.js?v=42';
 document.title = BRAND.title;
 
 const MONTHS = ['იანვარი', 'თებერვალი', 'მარტი', 'აპრილი', 'მაისი', 'ივნისი', 'ივლისი', 'აგვისტო', 'სექტემბერი', 'ოქტომბერი', 'ნოემბერი', 'დეკემბერი'];
